@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-sonarcloud:
+ sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
     steps:
@@ -19,7 +19,6 @@ sonarcloud:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
-        node-version: '14.x'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -37,24 +36,24 @@ sonarcloud:
           name: node-app
           path: .
   
-    deploy:
-     runs-on: ubuntu-latest
-     needs: build
-     environment:
-       name: 'Production'
-       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+ deploy:
+   runs-on: ubuntu-latest
+   needs: build
+   environment:
+     name: 'Production'
+     url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
-     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v2
-        with:
-          name: node-app
+   steps:
+    - name: Download artifact from build job
+      uses: actions/download-artifact@v2
+      with:
+        name: node-app
 
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'node-sonar'
-          slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_40377FE7A2C34A44AC170D5997FE6A9B }}
-          package: .
+    - name: 'Deploy to Azure Web App'
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'node-sonar'
+        slot-name: 'Production'
+        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_40377FE7A2C34A44AC170D5997FE6A9B }}
+        package: .
